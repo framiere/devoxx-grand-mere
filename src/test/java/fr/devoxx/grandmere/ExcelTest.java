@@ -2,9 +2,7 @@ package fr.devoxx.grandmere;
 
 import com.google.common.io.Resources;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
-import org.apache.poi.ss.usermodel.Row;
-import org.apache.poi.ss.usermodel.Sheet;
-import org.apache.poi.ss.usermodel.Workbook;
+import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.junit.Test;
 
@@ -23,8 +21,45 @@ public class ExcelTest {
         for (int rowId = perf.getFirstRowNum(); rowId < perf.getLastRowNum(); rowId++) {
             Row row = perf.getRow(rowId);
             for (int column = 0; column < row.getLastCellNum(); column++) {
-                assertThat(row.getCell(column)).isNotNull();
+                Cell cell = row.getCell(column);
+                System.out.println(cell);
+                assertThat(cell).isNotNull();
             }
+        }
+    }
+
+    @Test
+    public void should_load_execute() {
+        Workbook workbook = getWorkbook("perf.xlsx");
+        FormulaEvaluator evaluator = workbook.getCreationHelper().createFormulaEvaluator();
+
+        Sheet perf = workbook.getSheetAt(0);
+        for (int rowId = perf.getFirstRowNum(); rowId < perf.getLastRowNum(); rowId++) {
+            Row row = perf.getRow(rowId);
+            for (int column = 0; column < row.getLastCellNum(); column++) {
+                String cell = cell(row.getCell(column), evaluator);
+                System.out.println(cell);
+                assertThat(cell).describedAs("Cell " + rowId + ":" + column).isNotNull();
+            }
+        }
+    }
+
+    private String cell(Cell cell, FormulaEvaluator evaluator) {
+        switch(cell.getCellType()) {
+            case Cell.CELL_TYPE_FORMULA:
+                return evaluator.evaluate(cell).formatAsString();
+            case Cell.CELL_TYPE_NUMERIC:
+                return "" + cell.getNumericCellValue();
+            case Cell.CELL_TYPE_STRING:
+                return cell.getStringCellValue();
+            case Cell.CELL_TYPE_BOOLEAN:
+                return "" + cell.getBooleanCellValue();
+            case Cell.CELL_TYPE_BLANK:
+                return "";
+            case Cell.CELL_TYPE_ERROR:
+                return null;
+            default:
+                throw new IllegalStateException("Could not handle " + cell.getCellType());
         }
     }
 

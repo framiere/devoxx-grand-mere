@@ -27,7 +27,7 @@ public class GrandMereVisitor extends GrandMereBaseVisitor<String> {
 
     @Override
     public String visitHigh_priority_operation(GrandMereParser.High_priority_operationContext ctx) {
-        switch(ctx.getText()) {
+        switch (ctx.getText()) {
             case "*":
                 return "multiply";
             case "/":
@@ -44,7 +44,7 @@ public class GrandMereVisitor extends GrandMereBaseVisitor<String> {
 
     @Override
     public String visitLow_priority_operation(GrandMereParser.Low_priority_operationContext ctx) {
-        switch(ctx.getText()) {
+        switch (ctx.getText()) {
             case "+":
                 return "add";
             case "-":

@@ -20,12 +20,10 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 public class ExcelTest extends AbstractBenchmark {
     private static Workbook workbook;
-    private static CreationHelper creationHelper;
 
     @BeforeClass
     public static void loadWorkBook() {
         workbook = getWorkbook("perf.xlsx");
-        creationHelper = workbook.getCreationHelper();
     }
 
     @BenchmarkOptions(benchmarkRounds = 1000, warmupRounds = 100, concurrency = 8)
@@ -47,7 +45,7 @@ public class ExcelTest extends AbstractBenchmark {
     @BenchmarkOptions(benchmarkRounds = 1000, warmupRounds = 100, concurrency = 8)
     @Test
     public void should_load_execute() {
-        FormulaEvaluator evaluator = creationHelper.createFormulaEvaluator();
+        FormulaEvaluator evaluator = workbook.getCreationHelper().createFormulaEvaluator();
 
         Sheet perf = workbook.getSheetAt(0);
         for (int rowId = perf.getFirstRowNum(); rowId < perf.getLastRowNum(); rowId++) {
